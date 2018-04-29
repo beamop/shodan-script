@@ -14,18 +14,23 @@ api_key = 'VsrdI0B48xCBwhlMSrv5GaZUtOua3qsy'
 # banner
 def banner
 	puts "
-	███████╗██╗  ██╗ ██████╗ ██████╗  █████╗ ███╗   ██╗      ███████╗ ██████╗██████╗ ██╗██████╗ ████████╗
-	██╔════╝██║  ██║██╔═══██╗██╔══██╗██╔══██╗████╗  ██║      ██╔════╝██╔════╝██╔══██╗██║██╔══██╗╚══██╔══╝
-	███████╗███████║██║   ██║██║  ██║███████║██╔██╗ ██║█████╗███████╗██║     ██████╔╝██║██████╔╝   ██║   
-	╚════██║██╔══██║██║   ██║██║  ██║██╔══██║██║╚██╗██║╚════╝╚════██║██║     ██╔══██╗██║██╔═══╝    ██║   
-	███████║██║  ██║╚██████╔╝██████╔╝██║  ██║██║ ╚████║      ███████║╚██████╗██║  ██║██║██║        ██║   
-	╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═══╝      ╚══════╝ ╚═════╝╚═╝  ╚═╝╚═╝╚═╝        ╚═╝   ".red
+███████╗██╗  ██╗ ██████╗ ██████╗  █████╗ ███╗   ██╗      ███████╗ ██████╗██████╗ ██╗██████╗ ████████╗
+██╔════╝██║  ██║██╔═══██╗██╔══██╗██╔══██╗████╗  ██║      ██╔════╝██╔════╝██╔══██╗██║██╔══██╗╚══██╔══╝
+███████╗███████║██║   ██║██║  ██║███████║██╔██╗ ██║█████╗███████╗██║     ██████╔╝██║██████╔╝   ██║   
+╚════██║██╔══██║██║   ██║██║  ██║██╔══██║██║╚██╗██║╚════╝╚════██║██║     ██╔══██╗██║██╔═══╝    ██║   
+███████║██║  ██║╚██████╔╝██████╔╝██║  ██║██║ ╚████║      ███████║╚██████╗██║  ██║██║██║        ██║   
+╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═══╝      ╚══════╝ ╚═════╝╚═╝  ╚═╝╚═╝╚═╝        ╚═╝   ".red
 
 	puts
 
 	puts "
-	beamop 2018.
-	still learning ruby, it sucks I know.".yellow
+beamop 2018.
+still learning ruby, it sucks I know.".yellow
+
+	puts
+
+	puts "
+*****************************************************************************************************".yellow
 
 	puts
 end
@@ -56,47 +61,90 @@ begin
 	# puts banner
 	banner
 
-	# filters
-	print "Enter a query string (eg. cisco-ios): ".light_green
-	f1 = STDIN.gets.downcase.chomp
-
-	print "How much IPs do you need (max. 100): ".light_green
-	f2 = STDIN.gets.downcase.chomp.to_i
-
-	print "Do you want to save the result to a file? ".light_green
-	f3 = gets.chomp
-	case f3
-		when 'y', 'Y', 'yes'
-			f3 = true
-		when 'n', 'N', 'no'
-			f3 = false
+	# choice
+	puts "1. Get all the information SHODAN has on IP address.".blue
+	puts
+	puts "2. Do a simple search using a query name or device name and show them in a table.".blue
+	puts
+	print "Please enter your choice. ".red
+	c1 = gets.chomp.to_i
+	case c1
+		when 1
+			c1 = 1
+		when 2
+			c1 = 2
 	end
 
-	# result
-	result = api.search(f1)
-	tresult = Terminal::Table.new do |t|
-		t.headings = ['index', 'ip address', 'port', 'org', 'isp']
-		result['matches'].first(f2).each_with_index{ |host, index|
-			t << ["#{index}", host['ip_str'], host['port'], host['org'], host['isp']]
-		}
+	# choice 1
+	if c1 == 1
+		cls 
+
+		print "Enter the IP (eg. 127.0.0.1): ".light_green
+		f1 = STDIN.gets.downcase.chomp
+
+		# result
+		result = api.host(f1)
+		tresult = Terminal::Table.new do |t|
+			t.headings = ['index', 'country', 'ip address', 'last update', 'org', 'isp', 'longitude', 'latitude']
+			t << ["1", result['country_name'], result['ip_str'], result['last_update'], result['org'], result['isp'], result['longitude'], result['latitude']]
+		end
+
+		cls
+
+		puts tresult
+
+		puts
+			puts 'Thanks for using my simple demo tool, feel free to contribute.'.blue
+		puts
+
 	end
 
-	cls
+	# choice 2
+	if c1 == 2
+		cls
 
-	puts tresult
+		# filters
+		print "Enter a query string (eg. cisco-ios): ".light_green
+		f1 = STDIN.gets.downcase.chomp
 
-	# save result to file
-	if f3 == true
-		d = DateTime.now
-		d.strftime("%d/%m/%Y/%H/%M")
-		File.open(File.expand_path("results/result_#{f1}_#{d}.txt"), 'w') {|f| f.write(tresult) }
-		puts
-		puts "File saved to 'results/result_#{f1}_#{d}.txt', thanks for using my simple demo tool, feel free to contribute.".blue
-		puts
-	else
-		puts
-		puts 'Thanks for using my simple demo tool, feel free to contribute.'.blue
-		puts
+		print "How much IPs do you need (max. 100): ".light_green
+		f2 = STDIN.gets.downcase.chomp.to_i
+
+		print "Do you want to save the result to a file? ".light_green
+		f3 = gets.chomp
+		case f3
+			when 'y', 'Y', 'yes'
+				f3 = true
+			when 'n', 'N', 'no'
+				f3 = false
+		end
+
+		# result
+		result = api.search(f1)
+		tresult = Terminal::Table.new do |t|
+			t.headings = ['index', 'ip address', 'port', 'org', 'isp']
+			result['matches'].first(f2).each_with_index{ |host, index|
+				t << ["#{index}", host['ip_str'], host['port'], host['org'], host['isp']]
+			}
+		end
+
+		cls
+
+		puts tresult
+
+		# save result to file
+		if f3 == true
+			d = DateTime.now
+			d.strftime("%d/%m/%Y/%H/%M")
+			File.open(File.expand_path("results/result_#{f1}_#{d}.txt"), 'w') {|f| f.write(tresult) }
+			puts
+			puts "File saved to 'results/result_#{f1}_#{d}.txt', thanks for using my simple demo tool, feel free to contribute.".blue
+			puts
+		else
+			puts
+			puts 'Thanks for using my simple demo tool, feel free to contribute.'.blue
+			puts
+		end
 	end
 rescue Exception => e
 	puts 'Error! Please check logs folder.'
