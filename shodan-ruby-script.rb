@@ -9,7 +9,7 @@ require 'fileutils'
 ##############################
 # Your Shodan API KEY
 ##############################
-api_key = 'VsrdI0B48xCBwhlMSrv5GaZUtOua3qs'
+api_key = 'VsrdI0B48xCBwhlMSrv5GaZUtOua3qsy'
 
 # banner
 def banner
@@ -75,11 +75,13 @@ begin
 	# result
 	result = api.search(f1)
 	tresult = Terminal::Table.new do |t|
-		t.headings = ['index', 'ip address', 'port']
+		t.headings = ['index', 'ip address', 'port', 'org', 'isp']
 		result['matches'].first(f2).each_with_index{ |host, index|
-			t << ["#{index}", host['ip_str'], host['port']]
+			t << ["#{index}", host['ip_str'], host['port'], host['org'], host['isp']]
 		}
 	end
+
+	cls
 
 	puts tresult
 
@@ -88,6 +90,13 @@ begin
 		d = DateTime.now
 		d.strftime("%d/%m/%Y/%H/%M")
 		File.open(File.expand_path("results/result_#{f1}_#{d}.txt"), 'w') {|f| f.write(tresult) }
+		puts
+		puts "File saved to 'results/result_#{f1}_#{d}.txt', thanks for using my simple demo tool, feel free to contribute.".blue
+		puts
+	else
+		puts
+		puts 'Thanks for using my simple demo tool, feel free to contribute.'.blue
+		puts
 	end
 rescue Exception => e
 	puts 'Error! Please check logs folder.'
